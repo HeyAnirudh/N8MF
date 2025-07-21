@@ -1,27 +1,24 @@
-# clean_api.py
+from openpyxl import load_workbook
 from flask import Flask, request, jsonify
-import pandas as pd
-from io import BytesIO
-import json
 
 app = Flask(__name__)
 
 @app.route('/clean-mf', methods=['POST'])
-def clean_mutual_fund():
+def clean_mf():
     file = request.files['file']
-    df = pd.read_excel(BytesIO(file.read()))
-    df_clean = df.dropna()
+    wb = load_workbook(file)
+    ws = wb.active
 
-    data = {}
-    for i in range(len(df_clean.columns)):
-        data[df_clean.iloc[0, i]] = []
+    # Read header
+    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    data = {header: [] for header in headers if header}
 
-    for i in df_clean.columns:
-        column = [i for i in df_clean[i]]
-        if column[0] in data:
-            data[column[0]] = column[1:]
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        for i, value in enumerate(row):
+            if headers[i]:
+                data[headers[i]].append(value)
 
-    return json.dumps(data)
+    return jsonify(data)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
