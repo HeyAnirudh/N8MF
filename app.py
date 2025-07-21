@@ -18,8 +18,14 @@ def clean_mf():
         tmp.flush()
         tmp_path = tmp.name
 
-    wb = load_workbook(tmp_path)
+    wb = load_workbook(tmp_path,data_only=True)
     ws = wb.active
+    print("Sheet names:", wb.sheetnames)
+    print("Active sheet title:", ws.title)
+
+    print("All rows in file:")
+    for row in ws.iter_rows(values_only=True):
+        print(row)
 
     headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1)) or []]
     print("Headers:", headers)
