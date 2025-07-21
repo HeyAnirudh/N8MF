@@ -9,8 +9,15 @@ def clean_mf():
     wb = load_workbook(file)
     ws = wb.active
 
+    # Print raw rows for debugging
+    print("Rows in Excel:")
+    for row in ws.iter_rows(min_row=1, max_row=5, values_only=True):
+        print(row)
+
     # Read header
     headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    print("Headers:", headers)
+
     data = {header: [] for header in headers if header}
 
     for row in ws.iter_rows(min_row=2, values_only=True):
@@ -19,6 +26,5 @@ def clean_mf():
                 data[headers[i]].append(value)
 
     return jsonify(data)
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
