@@ -1,7 +1,9 @@
 services:
   - type: web
-    name: mf-cleaner
-    env: python
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    pythonVersion: 3.11.4
+    name: mutual-fund-cleaner
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
