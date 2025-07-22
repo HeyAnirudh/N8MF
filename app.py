@@ -1,43 +1,27 @@
-from openpyxl import load_workbook
+# clean_api.py
 from flask import Flask, request, jsonify
-
-from flask import Flask, request, jsonify
-import tempfile
-from openpyxl import load_workbook
+import pandas as pd
+from io import BytesIO
+import json
 
 app = Flask(__name__)
 
 @app.route('/clean-mf', methods=['POST'])
-def clean_mf():
-    uploaded_file = request.files['file']
-    print("Received file:", uploaded_file.filename)
+def clean_mutual_fund():
+    file = request.files['file']
+    df = pd.read_excel(BytesIO(file.read()))
+    df_clean = df.dropna()
 
-    # Save the file temporarily
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-        uploaded_file.save(tmp.name)
-        tmp.flush()
-        tmp_path = tmp.name
+    data = {}
+    for i in range(len(df_clean.columns)):
+        data[df_clean.iloc[0, i]] = []
 
-    wb = load_workbook(tmp_path,data_only=True)
-    ws = wb.active
-    print("Sheet names:", wb.sheetnames)
-    print("Active sheet title:", ws.title)
+    for i in df_clean.columns:
+        column = [i for i in df_clean[i]]
+        if column[0] in data:
+            data[column[0]] = column[1:]
 
-    print("All rows in file:")
-    for row in ws.iter_rows(values_only=True):
-        print(row)
+    return json.dumps(data)
 
-    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1)) or []]
-    print("Headers:", headers)
-
-    data = {header: [] for header in headers if header}
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        for i, value in enumerate(row):
-            if headers[i]:
-                data[headers[i]].append(value)
-
-    print("Data extracted:", data)
-    return jsonify(data)
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(debug=True)
