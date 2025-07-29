@@ -1,6 +1,6 @@
-# 🧠 N8MF – Mutual Fund AI Assistant using n8n + Gemini + Google Drive + Flask
+# 🧠 mf.you – Mutual Fund AI Assistant using n8n + Gemini + Google Drive + Flask
 
-**N8MF** is a fully automated Mutual Fund portfolio analyzer that combines the power of:
+**mf.you** is a fully automated Mutual Fund portfolio analyzer that combines the power of:
 - 🔁 **n8n** for automation and chat interface
 - 🧠 **Gemini AI** for intelligent insights
 - 📂 **Google Drive** for uploading your mutual fund statements
